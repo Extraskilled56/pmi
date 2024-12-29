@@ -5,7 +5,7 @@ fun help() {
     val help_content = """
 Usage pmi: <command>
     init         Initialize a new project
-    init module
+    init module (EXPERIMENTAL) Initialize a new module
 Usage: pmi git <command>
     -- git wrapper
 Usage: pmi code <command>
@@ -17,6 +17,8 @@ Usage: pmi script <command>
     run          Run a script
     edit         Edit a script
     delete       Delete a script
+Experimental!! Usage: pmi module <command>
+    install      Install modules
     """
     println(help_content)
 }
@@ -74,7 +76,10 @@ fun main(args: Array<String>) {
             } else {
                 when (args[1]) {
                     "build" -> task_build(srcfiles)
-                    "run" -> task_run_build(srcfiles ?: emptyList(), args.drop(2))
+                    "run" -> {
+                        val override = args.contains("--override")
+                        task_run_build(srcfiles ?: emptyList(), args.drop(2).filter { it != "--override" }, override)
+                    }
                     else -> {
                         printlnc("Error: Invalid code subcommand. Use 'build' or 'run'", red)
                         help()
@@ -129,6 +134,7 @@ fun main(args: Array<String>) {
             }
         }
         "module" -> {
+            printlnc("WARNING: Module command is still being worked on. Use With Caution!", yellow)
             if (args.size < 2) {
                 printlnc("Error: Module command requires a subcommand (install)", red)
                 help()
